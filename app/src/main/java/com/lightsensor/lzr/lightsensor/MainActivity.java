@@ -12,6 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.lightsensor.lzr.lightsensor.util.LightSensorUtils;
+import com.lightsensor.lzr.lightsensor.util.OtherUtils;
+import com.lightsensor.lzr.lightsensor.util.SaveUtil;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import jxl.write.WriteException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvMol;
     private Button btStart;
     private Button btCali;
+    private long time;
+    private boolean isStarted;
+    private ArrayList<String> timeList = new ArrayList<>();
+    private ArrayList<String> aList = new ArrayList<>();
+    private ArrayList<String> bList = new ArrayList<>();
+    private ArrayList<String> xList = new ArrayList<>();
+    private ArrayList<String> lightList = new ArrayList<>();
+    private ArrayList<String> conList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initData() {
+        time = System.currentTimeMillis();
         tvLight.setText(String.format(getString(R.string.light_num), 0 + ""));
         tvMol.setText(String.format(getString(R.string.mol_num), 0 + ""));
     }
@@ -46,23 +62,53 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, CalibrationActivity.class));
             }
         });
+
+        btStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isStarted) {
+                    LightSensorUtils.registerSensor(MainActivity.this, mySensorEventListener);
+                    btStart.setText("Stop");
+                } else {
+                    LightSensorUtils.unRegisterSensor(MainActivity.this, mySensorEventListener);
+                    try {
+                        SaveUtil.saveDataToExcel(timeList, aList, bList, xList, lightList, conList);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (WriteException e) {
+                        e.printStackTrace();
+                    }
+                    clearData();
+                    btStart.setText("Start");
+                }
+                isStarted = !isStarted;
+            }
+        });
+    }
+
+    private void clearData() {
+        timeList.clear();
+        aList.clear();
+        bList.clear();
+        xList.clear();
+        lightList.clear();
+        conList.clear();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        LightSensorUtils.registerSensor(this, mySensorEventListener);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         LightSensorUtils.unRegisterSensor(this, mySensorEventListener);
     }
 
     private class MySensorEventListener implements SensorEventListener {
         @Override
         public void onSensorChanged(final SensorEvent event) {
+            if (System.currentTimeMillis() - time < 1000) {
+                return;
+            } else {
+                time = System.currentTimeMillis();
+            }
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 int realBright = (int) event.values[0] - GlobalData.caliLight;
                 tvLight.setText(String.format(getString(R.string.light_num), realBright + ""));
@@ -70,7 +116,15 @@ public class MainActivity extends AppCompatActivity {
                     if (!TextUtils.isEmpty(GlobalData.dataX)) {
                         realBright = Integer.parseInt(GlobalData.dataX);
                     }
-                    tvMol.setText(String.format(getString(R.string.mol_num), (realBright * GlobalData.dataA + GlobalData.dataB) + ""));
+                    tvMol.setText(String.format(getString(R.string.mol_num),
+                            OtherUtils.formatToSave2All(realBright * GlobalData.dataA + GlobalData.dataB)) + "");
+
+                    timeList.add(OtherUtils.getCurrentTime());
+                    aList.add(String.valueOf(GlobalData.dataA));
+                    bList.add(String.valueOf(GlobalData.dataB));
+                    xList.add(GlobalData.dataX);
+                    lightList.add(String.valueOf(realBright));
+                    conList.add(String.valueOf(OtherUtils.formatToSave2All(realBright * GlobalData.dataA + GlobalData.dataB)));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

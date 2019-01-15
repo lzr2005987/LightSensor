@@ -9,16 +9,16 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lightsensor.lzr.lightsensor.util.LightSensorUtils;
 import com.lightsensor.lzr.lightsensor.util.OtherUtils;
 import com.lightsensor.lzr.lightsensor.util.SaveUtil;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import jxl.write.WriteException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,14 +27,17 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvMol;
     private Button btStart;
     private Button btCali;
+    private EditText etTimer;
     private long time;
     private boolean isStarted;
+    private Timer timer;
     private ArrayList<String> timeList = new ArrayList<>();
     private ArrayList<String> aList = new ArrayList<>();
     private ArrayList<String> bList = new ArrayList<>();
     private ArrayList<String> xList = new ArrayList<>();
     private ArrayList<String> lightList = new ArrayList<>();
     private ArrayList<String> conList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         tvMol = findViewById(R.id.tv_mol);
         btCali = findViewById(R.id.bt_cali);
         btStart = findViewById(R.id.bt_start);
+        etTimer = findViewById(R.id.et_timer);
         initData();
         initListener();
     }
@@ -68,20 +72,62 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!isStarted) {
                     LightSensorUtils.registerSensor(MainActivity.this, mySensorEventListener);
+                    if (!TextUtils.isEmpty(etTimer.getText().toString())) {
+                        startTimer();
+                    }
                     btStart.setText("Stop");
                 } else {
-                    LightSensorUtils.unRegisterSensor(MainActivity.this, mySensorEventListener);
-                    try {
-                        SaveUtil.saveDataToExcel(timeList, aList, bList, xList, lightList, conList);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (WriteException e) {
-                        e.printStackTrace();
-                    }
-                    clearData();
-                    btStart.setText("Start");
+                    stopAndRecord();
                 }
                 isStarted = !isStarted;
+            }
+        });
+    }
+
+    private void startTimer() {
+        timer = new Timer();
+        etTimer.setEnabled(false);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                final String timer = etTimer.getText().toString();
+                if (Integer.parseInt(timer) <= 0) {
+                    stopAndRecord();
+                    isStarted = false;
+                } else {
+                    etTimer.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            etTimer.setText((Integer.parseInt(timer) - 1) + "");
+                        }
+                    });
+                }
+            }
+        }, 0, 1000);
+    }
+
+    private void stopAndRecord() {
+        LightSensorUtils.unRegisterSensor(MainActivity.this, mySensorEventListener);
+        try {
+            SaveUtil.saveDataToExcel(timeList, aList, bList, xList, lightList, conList);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        clearData();
+        if (timer != null) {
+            timer.cancel();
+        }
+        btStart.post(new Runnable() {
+            @Override
+            public void run() {
+                btStart.setText("Start");
+            }
+        });
+
+        etTimer.post(new Runnable() {
+            @Override
+            public void run() {
+                etTimer.setEnabled(true);
             }
         });
     }

@@ -55,13 +55,15 @@
             android:text="Reaction Time" />
 
         <EditText
-            android:layout_width="40dp"
-            android:layout_height="wrap_content" />
+            android:id="@+id/et_timer"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="min" />
+            android:text="sec" />
     </LinearLayout>
 
     <Button

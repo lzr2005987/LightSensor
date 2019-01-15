@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -63,7 +64,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSensorChanged(final SensorEvent event) {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
-                tvLight.setText(String.format(getString(R.string.light_num), (event.values[0] - GlobalData.caliLight) + ""));
+                int realBright = (int) event.values[0] - GlobalData.caliLight;
+                tvLight.setText(String.format(getString(R.string.light_num), realBright + ""));
+                try {
+                    if (!TextUtils.isEmpty(GlobalData.dataX)) {
+                        realBright = Integer.parseInt(GlobalData.dataX);
+                    }
+                    tvMol.setText(String.format(getString(R.string.mol_num), (realBright * GlobalData.dataA + GlobalData.dataB) + ""));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 

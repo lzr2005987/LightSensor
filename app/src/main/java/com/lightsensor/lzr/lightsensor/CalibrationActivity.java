@@ -44,24 +44,29 @@ public class CalibrationActivity extends AppCompatActivity {
         btReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String a = etA.getText().toString();
-                String b = etB.getText().toString();
-                String x = etX.getText().toString();
-                String light = etLight.getText().toString();
-                try {
-                    GlobalData.caliLight = Integer.parseInt(light);
-                    GlobalData.dataA = Double.parseDouble(a);
-                    GlobalData.dataB = Double.parseDouble(b);
-                    if (!TextUtils.isEmpty(x)) {
-                        GlobalData.dataX = x;
-                    } else {
-                        GlobalData.dataX = "";
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 finish();
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        String a = etA.getText().toString();
+        String b = etB.getText().toString();
+        String x = etX.getText().toString();
+        String light = etLight.getText().toString();
+        try {
+            GlobalData.caliLight = Integer.parseInt(light);
+            GlobalData.dataA = Double.parseDouble(a);
+            GlobalData.dataB = Double.parseDouble(b);
+            if (!TextUtils.isEmpty(x)) {
+                GlobalData.dataX = x;
+            } else {
+                GlobalData.dataX = "";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

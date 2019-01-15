@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                     aList.add(String.valueOf(GlobalData.dataA));
                     bList.add(String.valueOf(GlobalData.dataB));
                     xList.add(GlobalData.dataX);
-                    lightList.add(String.valueOf(realBright));
+                    lightList.add(String.valueOf((int) event.values[0] - GlobalData.caliLight));
                     conList.add(String.valueOf(OtherUtils.formatToSave2All(realBright * GlobalData.dataA + GlobalData.dataB)));
                 } catch (Exception e) {
                     e.printStackTrace();

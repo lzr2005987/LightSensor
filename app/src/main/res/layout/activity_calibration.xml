@@ -15,11 +15,16 @@
             android:layout_height="wrap_content"
             android:text="Light calibration" />
 
+        <EditText
+            android:id="@+id/et_cali_light"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:text="0" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="%s  lux" />
+            android:text="lux" />
     </LinearLayout>
 
     <LinearLayout
@@ -46,9 +51,11 @@
                 android:text="a" />
 
             <EditText
-                android:layout_width="40dp"
+                android:id="@+id/et_cali_a"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp"
+                android:text="1" />
         </LinearLayout>
 
         <LinearLayout
@@ -63,14 +70,17 @@
                 android:text="b" />
 
             <EditText
-                android:layout_width="40dp"
+                android:id="@+id/et_cali_b"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp" />
+                android:layout_marginLeft="10dp"
+                android:text="0" />
         </LinearLayout>
 
     </LinearLayout>
 
     <Button
+        android:id="@+id/bt_return"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

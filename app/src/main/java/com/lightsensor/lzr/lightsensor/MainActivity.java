@@ -1,87 +1,75 @@
 package com.lightsensor.lzr.lightsensor;
 
-import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
-import java.util.List;
+import com.lightsensor.lzr.lightsensor.util.LightSensorUtils;
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener {
+public class MainActivity extends AppCompatActivity {
 
-    private SensorManager mSensorManager;
-    private boolean mIsContains;
+    private MySensorEventListener mySensorEventListener;
+    private TextView tvLight;
+    private TextView tvMol;
+    private Button btStart;
+    private Button btCali;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        //获取手机上支持的所有传感器
-        if (mSensorManager != null) {
-            List<Sensor> mList = mSensorManager.getSensorList(Sensor.TYPE_ALL);
-            for (Sensor sensor : mList) {
-                Log.d("KeithXiaoY", "名字：" + sensor.getName());
-                Log.d("KeithXiaoY", "type:" + sensor.getType());
-                Log.d("KeithXiaoY", "vendor:" + sensor.getVendor());
-                Log.d("KeithXiaoY", "version:" + sensor.getVersion());
-                Log.d("KeithXiaoY", "resolution:" + sensor.getResolution());
-                Log.d("KeithXiaoY", "max range:" + sensor.getMaximumRange());
-                Log.d("KeithXiaoY", "power:" + sensor.getPower());
-                if (Sensor.TYPE_LIGHT == sensor.getType()) {
-                    mIsContains = true; //这是一个 Boolean 值，true 代表有这个传感器、false 代表没有
-                    return;
-                }
-            }
-        }
-
+        tvLight = findViewById(R.id.tv_light);
+        tvMol = findViewById(R.id.tv_mol);
+        btCali = findViewById(R.id.bt_cali);
+        btStart = findViewById(R.id.bt_start);
+        initData();
+        initListener();
     }
 
-    /*  第三个参数是传感器数据更新数据的速度
-      有以下四个值可选，他们的速度是递增的
-      SENSOR_DELAY_UI
-      SENSOR_DELAY_NORMAL
-      SENSOR_DELAY_GAME
-      SENSOR_DELAY_FASTEST*/
-    public void registerSensor() {
-        // 获得光线传感器
-        if (null != mSensorManager) {
-            Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-            if (null != sensor && mIsContains) {
-                mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
-            }
-        }
+    private void initData() {
+        tvLight.setText(String.format(getString(R.string.light_num), 0 + ""));
+        tvMol.setText(String.format(getString(R.string.mol_num), 0 + ""));
+    }
 
+    private void initListener() {
+        mySensorEventListener = new MySensorEventListener();
+        btCali.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, CalibrationActivity.class));
+            }
+        });
     }
 
     @Override
-    public void onSensorChanged(SensorEvent event) {
-
+    public void onResume() {
+        super.onResume();
+        LightSensorUtils.registerSensor(this, mySensorEventListener);
     }
 
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
+    public void onPause() {
+        super.onPause();
+        LightSensorUtils.unRegisterSensor(this, mySensorEventListener);
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        mLightSensorUtils.registerSensor();
-//        Boolean isBright = mLightSensorUtils.getBright();
-//        if (null != isBright) {
-//            checkTheme();
-//        }
-//    }
-//
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        mLightSensorUtils.unRegisterSensor();
-//    }
+    private class MySensorEventListener implements SensorEventListener {
+        @Override
+        public void onSensorChanged(final SensorEvent event) {
+            if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
+                tvLight.setText(String.format(getString(R.string.light_num), (event.values[0] - GlobalData.caliLight) + ""));
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    }
 }

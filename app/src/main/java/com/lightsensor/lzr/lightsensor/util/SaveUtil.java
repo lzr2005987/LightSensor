@@ -25,6 +25,7 @@ public class SaveUtil {
 
     public static void saveDataToExcel(ArrayList<String> timeList, ArrayList<String> aList,
                                        ArrayList<String> bList, ArrayList<String> xList,
+                                       ArrayList<String> caliList,ArrayList<String> lightOrgList,
                                        ArrayList<String> lightList, ArrayList<String> conList) throws IOException, WriteException {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
         String formatTime = df.format(new Date());
@@ -67,16 +68,20 @@ public class SaveUtil {
         sheet.addCell(new Label(1, startRows, "a"));
         sheet.addCell(new Label(2, startRows, "b"));
         sheet.addCell(new Label(3, startRows, "x"));
-        sheet.addCell(new Label(4, startRows, "Light intensity"));
-        sheet.addCell(new Label(5, startRows, "Concentration"));
+        sheet.addCell(new Label(4, startRows, "ALS reading"));
+        sheet.addCell(new Label(5, startRows, "Light calibration"));
+        sheet.addCell(new Label(6, startRows, "Light intensity"));
+        sheet.addCell(new Label(7, startRows, "Concentration"));
 
         for (int i = 0; i < timeList.size(); i++) {
             sheet.addCell(new Label(0, startRows + i + 1, timeList.get(i)));
             sheet.addCell(new Label(1, startRows + i + 1, aList.get(i)));
             sheet.addCell(new Label(2, startRows + i + 1, bList.get(i)));
             sheet.addCell(new Label(3, startRows + i + 1, xList.get(i)));
-            sheet.addCell(new Label(4, startRows + i + 1, lightList.get(i)));
-            sheet.addCell(new Label(5, startRows + i + 1, conList.get(i)));
+            sheet.addCell(new Label(4, startRows + i + 1, lightOrgList.get(i)));
+            sheet.addCell(new Label(5, startRows + i + 1, caliList.get(i)));
+            sheet.addCell(new Label(6, startRows + i + 1, lightList.get(i)));
+            sheet.addCell(new Label(7, startRows + i + 1, conList.get(i)));
         }
 
         // 4、打开流，开始写文件

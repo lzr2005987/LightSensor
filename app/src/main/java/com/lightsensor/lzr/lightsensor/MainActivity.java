@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> aList = new ArrayList<>();
     private ArrayList<String> bList = new ArrayList<>();
     private ArrayList<String> xList = new ArrayList<>();
+    private ArrayList<String> caliList = new ArrayList<>();
+    private ArrayList<String> lightOrgList = new ArrayList<>();
     private ArrayList<String> lightList = new ArrayList<>();
     private ArrayList<String> conList = new ArrayList<>();
 
@@ -139,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
     private void stopAndRecord() {
         LightSensorUtils.unRegisterSensor(MainActivity.this, mySensorEventListener);
         try {
-            SaveUtil.saveDataToExcel(timeList, aList, bList, xList, lightList, conList);
+            SaveUtil.saveDataToExcel(timeList, aList, bList, xList, caliList, lightOrgList, lightList, conList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -199,6 +201,8 @@ public class MainActivity extends AppCompatActivity {
                     aList.add(String.valueOf(GlobalData.dataA));
                     bList.add(String.valueOf(GlobalData.dataB));
                     xList.add(GlobalData.dataX);
+                    lightOrgList.add(String.valueOf((int) event.values[0]));
+                    caliList.add(String.valueOf(GlobalData.caliLight));
                     lightList.add(String.valueOf((int) event.values[0] - GlobalData.caliLight));
                     conList.add(String.valueOf(OtherUtils.formatToSave2All(realBright * GlobalData.dataA + GlobalData.dataB)));
                 } catch (Exception e) {

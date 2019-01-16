@@ -11,12 +11,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.lightsensor.lzr.easypermission.EasyPermission;
+import com.lightsensor.lzr.easypermission.GrantResult;
+import com.lightsensor.lzr.easypermission.NextAction;
+import com.lightsensor.lzr.easypermission.NextActionType;
+import com.lightsensor.lzr.easypermission.Permission;
+import com.lightsensor.lzr.easypermission.PermissionRequestListener;
+import com.lightsensor.lzr.easypermission.RequestPermissionRationalListener;
 import com.lightsensor.lzr.lightsensor.util.LightSensorUtils;
 import com.lightsensor.lzr.lightsensor.util.OtherUtils;
 import com.lightsensor.lzr.lightsensor.util.SaveUtil;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -50,6 +59,27 @@ public class MainActivity extends AppCompatActivity {
         etTimer = findViewById(R.id.et_timer);
         initData();
         initListener();
+
+        EasyPermission.with(this)
+                .addPermissions(Permission.Group.STORAGE)
+                .addRequestPermissionRationaleHandler(Permission.WRITE_EXTERNAL_STORAGE, new RequestPermissionRationalListener() {
+                    @Override
+                    public void onRequestPermissionRational(String permission, boolean requestPermissionRationaleResult, NextAction nextAction) {
+                        nextAction.next(NextActionType.NEXT);
+                    }
+                })
+                .request(new PermissionRequestListener() {
+                    @Override
+                    public void onGrant(Map<String, GrantResult> result) {
+
+                    }
+
+                    @Override
+                    public void onCancel(String stopPermission) {
+                        Toast.makeText(MainActivity.this, "请开启权限", Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                });
     }
 
     private void initData() {

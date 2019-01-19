@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText etTimer;
     private long time;
     private boolean isStarted;
-    private Timer timer;
+    private Timer timerTask;
     private ArrayList<String> timeList = new ArrayList<>();
     private ArrayList<String> aList = new ArrayList<>();
     private ArrayList<String> bList = new ArrayList<>();
@@ -103,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isStarted) {
-                    LightSensorUtils.registerSensor(MainActivity.this, mySensorEventListener);
                     if (!TextUtils.isEmpty(etTimer.getText().toString())) {
                         startTimer();
                     }
@@ -117,9 +116,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTimer() {
-        timer = new Timer();
+        timerTask = new Timer();
         etTimer.setEnabled(false);
-        timer.schedule(new TimerTask() {
+        timerTask.schedule(new TimerTask() {
             @Override
             public void run() {
                 final String timer = etTimer.getText().toString();
@@ -139,15 +138,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopAndRecord() {
-        LightSensorUtils.unRegisterSensor(MainActivity.this, mySensorEventListener);
         try {
             SaveUtil.saveDataToExcel(timeList, aList, bList, xList, caliList, lightOrgList, lightList, conList);
         } catch (Exception e) {
             e.printStackTrace();
         }
         clearData();
-        if (timer != null) {
-            timer.cancel();
+        if (timerTask != null) {
+            timerTask.cancel();
         }
         btStart.post(new Runnable() {
             @Override
@@ -169,8 +167,16 @@ public class MainActivity extends AppCompatActivity {
         aList.clear();
         bList.clear();
         xList.clear();
+        caliList.clear();
+        lightOrgList.clear();
         lightList.clear();
         conList.clear();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LightSensorUtils.registerSensor(this, mySensorEventListener);
     }
 
     @Override
@@ -190,6 +196,9 @@ public class MainActivity extends AppCompatActivity {
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 int realBright = (int) event.values[0] - GlobalData.caliLight;
                 tvLight.setText(String.format(getString(R.string.light_num), realBright + ""));
+                if (!isStarted) {
+                    return;
+                }
                 try {
                     if (!TextUtils.isEmpty(GlobalData.dataX)) {
                         realBright = Integer.parseInt(GlobalData.dataX);

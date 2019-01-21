@@ -9,4 +9,5 @@ public class GlobalData {
     public static double dataA = 1;
     public static double dataB = 0;
     public static String dataX = "";
+    public static String name = "";
 }

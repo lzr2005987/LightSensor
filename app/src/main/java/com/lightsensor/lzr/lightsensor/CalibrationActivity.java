@@ -19,6 +19,7 @@ public class CalibrationActivity extends AppCompatActivity {
     private EditText etB;
     private EditText etX;
     private Button btReturn;
+    private EditText etName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class CalibrationActivity extends AppCompatActivity {
         etA = findViewById(R.id.et_cali_a);
         etB = findViewById(R.id.et_cali_b);
         etX = findViewById(R.id.et_cali_x);
+        etName = findViewById(R.id.et_name);
         btReturn = findViewById(R.id.bt_return);
         initData();
         initListener();
@@ -35,6 +37,7 @@ public class CalibrationActivity extends AppCompatActivity {
 
     private void initData() {
         etLight.setText(GlobalData.caliLight + "");
+        etName.setText(GlobalData.name);
         etA.setText(GlobalData.dataA + "");
         etB.setText(GlobalData.dataB + "");
         etX.setText(GlobalData.dataX);
@@ -55,6 +58,7 @@ public class CalibrationActivity extends AppCompatActivity {
         String a = etA.getText().toString();
         String b = etB.getText().toString();
         String x = etX.getText().toString();
+        String name = etName.getText().toString();
         String light = etLight.getText().toString();
         try {
             GlobalData.caliLight = Integer.parseInt(light);
@@ -64,6 +68,12 @@ public class CalibrationActivity extends AppCompatActivity {
                 GlobalData.dataX = x;
             } else {
                 GlobalData.dataX = "";
+            }
+
+            if (!TextUtils.isEmpty(name)) {
+                GlobalData.name = name;
+            } else {
+                GlobalData.name = "";
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -40,7 +40,10 @@ public class MainActivity extends AppCompatActivity {
     private long time;
     private boolean isStarted;
     private Timer timerTask;
+    private static String reactionTime;
+
     private ArrayList<String> timeList = new ArrayList<>();
+    private ArrayList<String> nameList = new ArrayList<>();
     private ArrayList<String> aList = new ArrayList<>();
     private ArrayList<String> bList = new ArrayList<>();
     private ArrayList<String> xList = new ArrayList<>();
@@ -104,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (!isStarted) {
                     if (!TextUtils.isEmpty(etTimer.getText().toString())) {
+                        reactionTime = etTimer.getText().toString();
                         startTimer();
                     }
                     btStart.setText("Stop");
@@ -139,7 +143,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopAndRecord() {
         try {
-            SaveUtil.saveDataToExcel(timeList, aList, bList, xList, caliList, lightOrgList, lightList, conList);
+            if (!TextUtils.isEmpty(reactionTime)) {
+                etTimer.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        etTimer.setText(reactionTime);
+                    }
+                });
+            }
+            SaveUtil.saveDataToExcel(timeList, nameList, aList, bList, xList, caliList, lightOrgList, lightList, conList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -164,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void clearData() {
         timeList.clear();
+        nameList.clear();
         aList.clear();
         bList.clear();
         xList.clear();
@@ -207,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                             OtherUtils.formatToSave2All(realBright * GlobalData.dataA + GlobalData.dataB)) + "");
 
                     timeList.add(OtherUtils.getCurrentTime());
+                    nameList.add(TextUtils.isEmpty(GlobalData.name) ? "" : GlobalData.name);
                     aList.add(String.valueOf(GlobalData.dataA));
                     bList.add(String.valueOf(GlobalData.dataB));
                     xList.add(GlobalData.dataX);

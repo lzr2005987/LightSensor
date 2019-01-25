@@ -106,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isStarted) {
+                    time = System.currentTimeMillis();
                     if (!TextUtils.isEmpty(etTimer.getText().toString())) {
                         reactionTime = etTimer.getText().toString();
                         startTimer();
@@ -204,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
             if (System.currentTimeMillis() - time < 1000) {
                 return;
             } else {
-                time = System.currentTimeMillis();
+                time = time + 1000;
             }
             if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
                 int realBright = (int) event.values[0] - GlobalData.caliLight;
